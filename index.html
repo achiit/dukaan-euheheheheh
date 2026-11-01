@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ultimate Image Toolkit Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a; --card: rgba(30, 41, 59, 0.95);
+            --text: #f8fafc; --text-muted: #94a3b8;
+            --primary: #6366f1; --primary-dark: #4338ca;
+            --success: #10b981; --success-dark: #047857;
+            --warning: #f59e0b; --warning-dark: #b45309;
+            --danger: #ef4444; --border: #334155;
+            --font: 'Poppins', sans-serif;
+        }
+
+        .light-mode {
+            --bg: #f0f4f8; --card: rgba(255, 255, 255, 0.95);
+            --text: #1e293b; --text-muted: #64748b;
+            --border: #cbd5e1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font); transition: background 0.3s, color 0.3s; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 15px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        
+        /* Background Animation */
+        .bg-orb { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.4; animation: float 10s infinite alternate; }
+        .orb1 { width: 300px; height: 300px; background: #6366f1; top: -100px; left: -100px; }
+        .orb2 { width: 300px; height: 300px; background: #10b981; bottom: -100px; right: -100px; animation-delay: -5s; }
+        @keyframes float { 0% { transform: translate(0,0); } 100% { transform: translate(50px, 50px); } }
+
+        /* Top Bar */
+        .top-bar { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .top-bar h1 { font-size: 18px; font-weight: 800; background: -webkit-linear-gradient(45deg, #6366f1, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 12px; cursor: pointer; font-weight: 800; display: flex; gap: 5px; align-items: center; }
+
+        /* Main Card */
+        .card { background: var(--card); backdrop-filter: blur(10px); border: 1px solid var(--border); width: 100%; max-width: 500px; border-radius: 24px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin-bottom: 20px; position: relative; z-index: 1; }
+
+        /* Inputs & 3D Buttons */
+        .input-box { width: 100%; padding: 16px; background: var(--bg); border: 2px solid var(--border); border-radius: 14px; color: var(--text); font-size: 14px; font-weight: 600; outline: none; margin-bottom: 12px; }
+        .input-box:focus { border-color: var(--primary); }
+
+        .btn-3d { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; color: white; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; position: relative; top: 0; transition: all 0.1s; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        .btn-3d:active { top: 5px; }
+        
+        .btn-primary { background: linear-gradient(180deg, #6366f1, #4f46e5); box-shadow: 0 6px 0 var(--primary-dark); }
+        .btn-primary:active { box-shadow: 0 0 0 var(--primary-dark); }
+        
+        .btn-imgbb { background: linear-gradient(180deg, #fbbf24, #f59e0b); box-shadow: 0 6px 0 var(--warning-dark); color: #fff; }
+        .btn-imgbb:active { box-shadow: 0 0 0 var(--warning-dark); }
+
+        .btn-bulk { background: linear-gradient(180deg, #ec4899, #db2777); box-shadow: 0 6px 0 #831843; }
+        .btn-bulk:active { box-shadow: 0 0 0 #831843; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: var(--bg); padding: 5px; border-radius: 12px; }
+        .tab { flex: 1; padding: 10px; text-align: center; font-size: 12px; font-weight: 800; border-radius: 8px; cursor: pointer; color: var(--text-muted); }
+        .tab.active { background: var(--card); color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+
+        /* Result Area */
+        .result-area { display: none; margin-top: 20px; }
+        .img-preview { width: 100%; height: 200px; border-radius: 14px; background: repeating-conic-gradient(#334155 0% 25%, #1e293b 0% 50%) 50% / 20px 20px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 2px dashed var(--border); margin-bottom: 15px; position: relative;}
+        .img-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        .action-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .action-btn { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; text-align: center; border: none; color: #fff; }
+
+        .format-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .format-info { flex: 1; overflow: hidden; }
+        .format-title { font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
+        .format-val { font-size: 12px; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+        .copy-btn { background: var(--success); color: #fff; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; cursor: pointer; box-shadow: 0 3px 0 var(--success-dark); }
+        .copy-btn:active { transform: translateY(3px); box-shadow: none; }
+
+        /* History */
+        .history-item { display: flex; align-items: center; gap: 10px; background: var(--bg); padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid var(--border); cursor: pointer; }
+        .history-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+        .history-url { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+
+        .loader { display: none; text-align: center; font-weight: 800; color: var(--primary); margin: 20px 0; font-size: 14px;}
+        .spinner { width: 30px; height: 30px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-box { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 15px; border-radius: 12px; font-size: 13px; font-weight: 600; text-align: center; }
+    </style>
+</head>
+<body class="light-mode">
+
+    <div class="bg-orb orb1"></div>
+    <div class="bg-orb orb2"></div>
+
+    <div class="top-bar">
+        <h1>💎 Ultimate Toolkit</h1>
+        <div style="display:flex; gap:10px;">
+            <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()">🔊 Voice ON</button>
+            <button class="icon-btn" onclick="toggleTheme()">🌓</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('single')">Single Link</div>
+            <div class="tab" onclick="switchTab('bulk')">Bulk Extract</div>
+        </div>
+
+        <!-- SINGLE TAB -->
+        <div id="tab-single">
+            <button class="btn-3d btn-imgbb" onclick="openImgbb()">🚀 Step 1: Upload to ImgBB</button>
+            <div style="text-align:center; font-size:12px; font-weight:800; color:var(--text-muted); margin: 10px 0;">OR PASTE LINK BELOW</div>
+            <input type="text" id="urlInput" class="input-box" placeholder="Paste ImgBB/Imgur/Drive link here...">
+            <button class="btn-3d btn-primary" id="convertBtn" onclick="convertSingle()">✨ Convert Image Link</button>
+        </div>
+
+        <!-- BULK TAB -->
+        <div id="tab-bulk" style="display:none;">
+            <input type="text" id="bulkUrlInput" class="input-box" placeholder="Paste website/page URL to extract ALL images...">
+            <button class="btn-3d btn-bulk" id="bulkBtn" onclick="extractBulk()">🕵️ Extract All Images</button>
+        </div>
+
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <span id="loaderText">Processing...</span>
+        </div>
+
+        <div class="error-box" id="errorBox"></div>
+
+        <!-- RESULT AREA -->
+        <div class="result-area" id="resultArea">
+            <div class="img-preview">
+                <img id="mainImage" src="" onerror="this.src='https://via.placeholder.com/200?text=Error'">
+            </div>
+            
+            <div class="action-row">
+                <button class="action-btn" style="background:#3b82f6;" onclick="downloadImage()">⬇️ Download</button>
+                <button class="action-btn" style="background:#8b5cf6;" onclick="showQR()">📱 QR Code</button>
+            </div>
+
+            <div id="qrContainer" style="display:none; text-align:center; margin-bottom:15px; background:#fff; padding:10px; border-radius:12px;">
+                <img id="qrImage" src="" style="width:120px; height:120px;">
+            </div>
+
+            <div id="formatList">
+                <!-- Formats injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="card" id="historyCard" style="display:none;">
+        <h3 style="font-size:14px; margin-bottom:10px; color:var(--text-muted);">🕒 Recent Links</h3>
+        <div id="historyList"></div>
+    </div>
+
+    <script>
+        // --- CORE SETTINGS ---
+        let isVoiceOn = true;
+        let currentDirectLink = "";
+        let currentTheme = 'light-mode';
+
+        // --- SOUND & VOICE API ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playSound(type) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            
+            if(type === 'click') {
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if(type === 'success') {
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if(type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        function speak(text) {
+            if (!isVoiceOn || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'hi-IN'; u.rate = 1.1; u.pitch = 1;
+            window.speechSynthesis.speak(u);
+        }
+
+        function toggleVoice() {
+            playSound('click');
+            isVoiceOn = !isVoiceOn;
+            document.getElementById('voiceBtn').innerText = isVoiceOn ? '🔊 Voice ON' : '🔇 Voice OFF';
+            if(isVoiceOn) speak("Voice turned on");
+        }
+
+        function toggleTheme() {
+            playSound('click');
+            document.body.classList.toggle('light-mode');
+            currentTheme = document.body.classList.contains('light-mode') ? 'light-mode' : 'dark-mode';
+        }
+
+        function switchTab(tab) {
+            playSound('click');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-single').style.display = tab === 'single' ? 'block' : 'none';
+            document.getElementById('tab-bulk').style.display = tab === 'bulk' ? 'block' : 'none';
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('errorBox').style.display = 'none';
+        }
+
+        // --- IMAGE CONVERTER CORE ---
+        function openImgbb() {
+            playSound('click');
+            speak("ImgBB upload page open ho raha hai. Upload karke link copy karein.");
+            window.open("https://share.google/sXY4c07wldRQLhedL", "_blank");
+        }
+
+        async function convertSingle() {
+            playSound('click');
+            const url = document.getElementById('urlInput').value.trim();
+            if(!url) { playSound('error'); return showError("Bhai link toh daalo!"); }
+            
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('errorBox').style.display = 'none';
+            speak("Link check kar raha hu, thoda wait karein.");
+
+            // Agar direct link hai
+            if (url.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i) || url.includes('i.ibb.co/') || url.includes('i.imgur.com/')) {
+                processSuccess(url);
+                return;
+            }
+
+            // Page link fetch karo (Proxies)
+            let directUrl = null;
+            const proxies = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?', 'https://api.codetabs.com/v1/proxy?quest='];
+
+            for (let proxy of proxies) {
+                try {
+                    const res = await fetch(proxy + encodeURIComponent(url));
+                    if (!res.ok) continue;
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    
+                    // Meta Tags
+                    let meta = doc.querySelector('meta[property="og:image"]') || doc.querySelector('meta[name="twitter:image"]');
+                    if (meta) directUrl = meta.content;
+
+                    // Specific Img tags
+                    if (!directUrl) {
+                        let img = doc.querySelector('.image-container-img') || doc.querySelector('img[src*="i.ibb.co"]') || doc.querySelector('img[src*="i.imgur.com"]');
+                        if (img) directUrl = img.src;
+                    }
+                    if (directUrl) break;
+                } catch (e) { console.log("Proxy failed"); }
+            }
+
+            if (directUrl) {
+                processSuccess(directUrl);
+            } else {
+                document.getElementById('loader').style.display = 'none';
+                playSound('error');
+                showError("Link convert nahi ho paya. Page kholo, image par long-press karke 'Copy Image Address' karein aur woh link yahan paste karein.");
+            }
+        }
+
+        function processSuccess(link) {
+            link = link.replace(/&amp;/g, '&');
+            currentDirectLink = link;
+
+            document.getElementById('mainImage').src = link;
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('resultArea').style.display = 'block';
+            document.getElementById('qrContainer').style.display = 'none';
+            
+            playSound('success');
+            speak("Wow! Link successfully convert ho gaya.");
+            
+            generateFormats(link);
+            saveToHistory(link);
+        }
+
+        function generateFormats(link) {
+            const formats = [
+                { name: '⭐ Direct URL', val: link },
+                { name: '🌐 HTML Image', val: `<img src="${link}" alt="image">` },
+                { name: '📝 Markdown', val: `![image](${link})` },
+                { name: '🎨 CSS Background', val: `background-image: url('${link}');` },
+                { name: '💬 BBCode', val: `[img]${link}[/img]` },
+                { name: '🧩 JSON API', val: `{"image": "${link}"}` },
+                { name: '📱 WhatsApp Share', val: `https://wa.me/?text=${encodeURIComponent(link)}` },
+                { name: '🖼️ Small Thumbnail', val: `https://images.weserv.nl/?url=${encodeURIComponent(link)}&w=300` },
+                { name: '🖼️ Medium Thumbnail', val: `https://images.weserv.nl/?url=${encodeURIComponent(link)}&w=600` }
+            ];
+
+            let html = '';
+            formats.forEach((f, i) => {
+                html += `
+                <div class="format-card">
+                    <div class="format-info">
+                        <div class="format-title">${f.name}</div>
+                        <div class="format-val" id="fmt-${i}">${f.val}</div>
+                    </div>
+                    <button class="copy-btn" onclick="copyFormat('fmt-${i}')">Copy</button>
+                </div>`;
+            });
+            document.getElementById('formatList').innerHTML = html;
+        }
+
+        function copyFormat(id) {
+            playSound('click');
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text);
+            speak("Copy ho gaya!");
+            
+            // Visual Feedback
+            const btn = event.target;
+            const orig = btn.innerText;
+            btn.innerText = '✅ Done';
+            btn.style.background = '#047857';
+            setTimeout(() => { btn.innerText = orig; btn.style.background = 'var(--success)'; }, 1500);
+        }
+
+        function downloadImage() {
+            playSound('click');
+            if(!currentDirectLink) return;
+            speak("Image download ho rahi hai.");
+            const a = document.createElement('a');
+            a.href = currentDirectLink;
+            a.download = 'JMKCC_Image_' + Date.now() + '.jpg';
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function showQR() {
+            playSound('click');
+            speak("QR Code generate ho raha hai.");
+            const qrBox = document.getElementById('qrContainer');
+            const qrImg = document.getElementById('qrImage');
+            
+            if(qrBox.style.display === 'none') {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(currentDirectLink)}`;
+                qrBox.style.display = 'block';
+            } else {
+                qrBox.style.display = 'none';
+            }
+        }
+
+        // --- BULK EXTRACTOR ---
+        async function extractBulk() {
+            playSound('click');
+            const url = document.getElementById('bulkUrlInput').value.trim();
+            if(!url) { playSound('error'); return showError("Website ka URL daalo!"); }
+
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('loaderText').innerText = "Scanning all images...";
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('errorBox').style.display = 'none';
+            speak("Saari images dhundh raha hu. Thoda time lagega.");
+
+            try {
+                const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url));
+                const html = await res.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const imgs = doc.querySelectorAll('img');
+
+                let count = 0;
+                let htmlOutput = '';
+                
+                imgs.forEach(img => {
+                    let src = img.src;
+                    if(src && src.startsWith('http') && !src.includes('base64') && !src.includes('icon') && src.length > 20) {
+                        count++;
+                        htmlOutput += `
+                        <div class="history-item" onclick="document.getElementById('urlInput').value='${src}'; switchTab('single'); convertSingle();">
+                            <img src="${src}" onerror="this.style.display='none'">
+                            <div class="history-url">${src}</div>
+                        </div>`;
+                    }
+                });
+
+                if(count === 0) throw new Error("No images found");
+
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('resultArea').style.display = 'block';
+                document.getElementById('mainImage').style.display = 'none'; // Hide single preview
+                document.getElementById('formatList').innerHTML = `<h3 style="margin-bottom:10px;">🎉 Found ${count} Images (Click to convert)</h3>` + htmlOutput;
+                document.querySelector('.action-row').style.display = 'none';
+
+                playSound('success');
+                speak(`Wah! ${count} images mil gayi hain.`);
+
+            } catch (e) {
+                document.getElementById('loader').style.display = 'none';
+                playSound('error');
+                showError("Images extract nahi ho payi. Site block kar rahi hai.");
+            }
+        }
+
+        // --- HISTORY (LOCAL STORAGE) ---
+        function saveToHistory(link) {
+            let history = JSON.parse(localStorage.getItem('imgHistory')) || [];
+            if(!history.includes(link)) {
+                history.unshift(link);
+                if(history.length > 5) history.pop();
+                localStorage.setItem('imgHistory', JSON.stringify(history));
+            }
+            renderHistory();
+        }
+
+        function renderHistory() {
+            let history = JSON.parse(localStorage.getItem('imgHistory')) || [];
+            if(history.length === 0) return;
+
+            document.getElementById('historyCard').style.display = 'block';
+            let html = '';
+            history.forEach(link => {
+                html += `
+                <div class="history-item" onclick="document.getElementById('urlInput').value='${link}'; convertSingle();">
+                    <img src="${link}">
+                    <div class="history-url">${link}</div>
+                </div>`;
+            });
+            document.getElementById('historyList').innerHTML = html;
+        }
+
+        function showError(msg) {
+            const box = document.getElementById('errorBox');
+            box.innerText = "❌ " + msg;
+            box.style.display = 'block';
+        }
+
+        // Initialize
+        window.onload = () => {
+            renderHistory();
+            document.querySelector('.action-row').style.display = 'flex'; // Reset
+            document.getElementById('mainImage').style.display = 'block'; // Reset
+        };
+    </script>
+</body>
+</html>
